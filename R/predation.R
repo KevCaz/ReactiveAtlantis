@@ -67,17 +67,8 @@
 ##' @importFrom stats complete.cases
 ##' @author Demiurgo
 ##' @export
-predation <- function(biom.file, groups.csv, diet.file, age.biomass = NULL ){
-    txtHelp <- "<h2>Summary</h2>"
-    txtHelp <- paste(txtHelp, "<p>This program is useful for dynamically evaluating and visualizing predator-prey relationships from Atlantis</p>")
-    txtHelp <- paste(txtHelp, "<h3>Details</h3>")
-    txtHelp <- paste(txtHelp, "<p>The outputs of this program are divided into three parts: 1) <b>Biomass</b>, 2) <b>Predation through time</b>,  and 3) <b>Predation by age group</b>.</p>")
-    txtHelp <- paste(txtHelp, "<p><b>1) Biomass:</b> This panel displays the changes in total biomass for each functional group. Also, the sub-panel displays the variation of the total biomass relative to B0.</p>")
-    txtHelp <- paste(txtHelp, "<p><b>2) Predation through time:</b> This panel displays in the upper section the proportion of prey ingested by a specific predator (<i>Functional Group</i>) and stock (<i>Stocks</i>) during the entire Atlantis simulation. The lower plot section is the proportion of biomass that is predated from the selected functional group by different predators at each time step</p>")
-    txtHelp <- paste(txtHelp, "<p>The <i>Threshold</i> option filters the predation values, only the values of proportion of predation greater than this limit are displayed (values from 0 to 1).</p>")
-    txtHelp <- paste(txtHelp, "<p>The option scale (default <b>scale = TRUE</b>) allows you to integrate predation values between 0 and 1 for each time step. Otherwise, predation values are weighed by the predator's biomass. This allows to evaluate the impact of the predator on each prey at each time step.</p>")
-    txtHelp <- paste(txtHelp, "<p><b>2) Predation by Age group</b> This panel visualize the predation by age group. The first sub-panel (<b>Total Biomass</b>) shows the proportion of each prey in the diet of the selected predator at a given time step (lower plot section)</p>")
-    txtHelp <- paste(txtHelp, "<p>The upper plot is the variation of the total biomass of the functional group during the Atlantis simulation. The second sub-panel (<b>Biomass by Age</b>) shows the biomass of each prey consumed by each age class. This allows visualizing the impact (in biomass) of the predator in each of the prey. The upper panel shows the biomass of the prey throughout the simulation, indicating the selected time step.</p>")
+predation <- function(biom.file, groups.csv, diet.file, age.biomass = NULL ) {
+    txtHelp <- get_asset("predation_help.html")
     ## Reading Data
     cur.dat   <- data.frame(data.table::fread(biom.file, header = TRUE, sep = ' ', showProgress = FALSE))
     diet.data <- data.frame(data.table::fread(diet.file, header=TRUE, sep = ' ', showProgress = FALSE))
@@ -237,7 +228,7 @@ predation <- function(biom.file, groups.csv, diet.file, age.biomass = NULL ){
             }
 
             predator <- shiny::reactive({
-                predator        <- diet.data[diet.data$Predator ==  input$FG & diet.data$Stock == as.numeric(input$Stocks), ]
+                predator        <- diet.data[diet.data$Predator == input$FG & diet.data$Stock == as.numeric(input$Stocks), ]
                 predator        <- predator[,  -which(names(predator) %in% c('Predator', 'Cohort', 'Stock'))]
                 predator        <- predator[, (colSums(predator, na.rm = TRUE) > input$Thr)]
                 predator[which(predator < input$Thr,  arr.ind = TRUE)] <- NA

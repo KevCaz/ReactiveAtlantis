@@ -67,20 +67,7 @@
 ##' @author Demiurgo
 ##' @export
 feeding.mat <- function(prm.file, grp.file, nc.file, bgm.file, cum.depths, quiet = TRUE){
-    txtHelp <- "<h2>Summary</h2>"
-    txtHelp <- paste(txtHelp, "<p>This program displays data for the predator prey relationship for  <b>Atlantis</b> run. Also,  provide help for the tuning of the pprey matrix</p>")
-    txtHelp <- paste(txtHelp, "<h3>Details</h3>")
-    txtHelp <- paste(txtHelp, "<p>Plots have a zoom feature. Draw a box and double click to zoom into the box. Double click to reset zoom.</p>")
-    txtHelp <- paste(txtHelp, "<p>Using the input panel,  the user can select the focal prey (<b>Prey panel</b>) and predator <b>Predator panel</b> .</p>")
-    txtHelp <- paste(txtHelp, "<p>The <b>Original value :</b> box,  display the value that is used on the pprey matrix on the Biological parameter file.</p>")
-    txtHelp <- paste(txtHelp, "<p>The <b>Current value :</b> box,  display the value that the user set in the current run. If the user don't save the run,  the value will be lost.</p>")
-    txtHelp <- paste(txtHelp, "<p>On the <b>New value :</b> box,  the user can enter the new value for the pprey matrix for the selected predator and prey. The result of the application would be reflected on the current run in all the plots after the used click the box <b>Change value</b>.</p>")
-    txtHelp <- paste(txtHelp, "<p>The <b>Write pPREY Matrix</b> bottom create a txt file that contain the new pPrey matrix created by the user</p>")
-    txtHelp <- paste(txtHelp, "<p><b>Effective predation</b> Represent the total predation based on the Predator\'s biomass,  is the same approach that Beth used on the spreadsheet to calibrate predation. Values are on logarithmic scale</p>")
-    txtHelp <- paste(txtHelp, "<p><b>Availability matrix</b> The raw pPREY matrix from the biological parameter file.</p>")
-    txtHelp <- paste(txtHelp, "<p><b>Overlap matrix</b> shows if the predator is able to eat the prey based on the gape limitations.</p>")
-    txtHelp <- paste(txtHelp, "<p><b>% of predation pressure</b> Which percentage of each prey corresponds to the total consumed by the predator.</p>")
-    txtHelp <- paste(txtHelp, "<p><b>Total biomass prey</b> Total biomass of each functional group on logarithmic scale.</p>")
+    txtHelp <- get_asset("pprey_mat_help.html")
     if(!quiet) cat('\n\n # -  -  -  -  -  -  - #')
     if(!quiet) cat('\n # -     Step 1    -   #')
     if(!quiet) cat('\n # -  -  -  -  -  -  - #')
@@ -142,7 +129,7 @@ feeding.mat <- function(prm.file, grp.file, nc.file, bgm.file, cum.depths, quiet
         predator    <- gsub(pattern = "[[:digit:]]+", '\\1', c.pred)
         a.pred.prey <- as.numeric(unlist(strsplit(c.pred, predator)))
         pry.loc     <- which(bio.adl[, 1] %in% predator)
-        if(length(a.pred.prey) == 0 || is.na(a.pred.prey)) a.pred.prey[2] <- 2
+        if(length(a.pred.prey) == 0 || any(is.na(a.pred.prey))) a.pred.prey[2] <- 2
         ## Young Predator
         if(a.pred.prey[2] == 1){
             ## Young Prey
@@ -557,7 +544,7 @@ Bio.func <- function(nc.file, groups.csv, numlayers){
                     N.tot <- ncdf4::ncvar_get(nc.out, paste(FG[code], "_N", sep = ""))
                 }
                 if(all(is.na(N.tot)) || all(N.tot == 0) || sum(N.tot, na.rm = TRUE) == 0){
-                    ## Getting the total volumen
+                    ## Getting the total volume
                     water.t <- ncdf4::ncvar_get(nc.out, 'volume')
                     w.depth <- ncdf4::ncvar_get(nc.out, 'nominal_dz')
                     w.depth[is.na(w.depth)] <- 0
@@ -659,7 +646,7 @@ Bio.func <- function(nc.file, groups.csv, numlayers){
                     over.sp    <- cbind(over.sp, new.sp)
                     names.temp <- c(names.temp, paste(FGN[code], cohort, sep = '_'))
                 }
-                Biom.N[code, cohort] <- sum(StructN + ReservN * Numb, na.rm = TRUE)
+                Biom.N[code, cohort] <- sum((StructN + ReservN) * Numb, na.rm = TRUE)
                 Struct[code, cohort] <- max(StructN, na.rm = TRUE)
             }
         }
@@ -811,11 +798,13 @@ Over.mat.func <- function(Ava.mat, Gape){
     for( py in 1: length(Prey)){
         for( pd in 1: length(Pred)){
             c.pred      <- unlist(strsplit(Pred[pd],'pPREY'))[2]
-            predator    <- gsub(pattern = "[[:digit:]]+", '\\1', c.pred)
+            # KC there is something I don'understand here
+            predator    <- gsub(pattern = "[[:digit:]]+", "", c.pred)
             a.pred.prey <- as.numeric(unlist(strsplit(c.pred, predator)))
             pry.loc     <- which(Gape$FG %in% Prey[py])
             prd.loc     <- which(Gape$FG %in% predator)
-            if(length(pry.loc) == 0 || is.na(a.pred.prey)){
+            # browser()
+            if(length(pry.loc) == 0 || any(is.na(a.pred.prey))){
                 Over.mat [pd, py] <- 1
             } else {
                 if(a.pred.prey[1] == 1){

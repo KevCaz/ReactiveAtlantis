@@ -7,7 +7,7 @@ package as the main platform for the reactive programming approach.
 *ReactiveAtlantis* has several tools that were created to help in the tuning,
 parameterization and analysis of the processes and parameters most often modified
 during the calibration of Atlantis (e.g. growth rate, predation, recruitment,
-Audzijonyte *et al.* 2017. Among the processes performed by this
+Audzijonyte *et al.* 2017). Among the processes performed by this
 package are:
 * Visualization and analysis of the input, output and initial conditions of an Atlantis model.
 *  Interactive modification of Atlantis configuration files.
@@ -35,6 +35,7 @@ library("ReactiveAtlantis")
 
 ## Running *ReactiveAtlantis*
 ### Compare outputs and Biomass visualization
+
 ```R
 nc.current  <- 'your_current_output.nc'
 nc.old      <- 'your_previous_output.nc'
@@ -48,6 +49,7 @@ compare(nc.current, nc.old, grp.csv, bgm.file, cum.depths)
 ```
 
 ### Predation analysis from the Atlantis output
+
 ```R
 biom        <- 'your_BiomIndx.txt'
 diet.file   <- 'your_DietCheck.txt'
@@ -57,7 +59,6 @@ grp.csv     <- 'your_groups_definition_file.csv'
 predation(biom, grp.csv, diet.file, bio.age)
 ## No predation by Age
 predation(biom, grp.csv, diet.file, bio.age = NULL)
-
 ```
 
 ### Exploring predator-prey interactions from the initial conditions

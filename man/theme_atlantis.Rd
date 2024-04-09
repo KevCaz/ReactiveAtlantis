@@ -20,6 +20,4 @@ Main Atlatnis Theme
 }
 \author{
 Javier Porobic
-
-Javier Porobic
 }
